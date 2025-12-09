@@ -1,6 +1,6 @@
 Короткий README
 
-<img width="1024" height="1536" alt="let&#39;s go together1" src="https://github.com/user-attachments/assets/6cebf150-6752-48a1-81d6-238ed86e6ed3" />
+<img width="300" height="600" alt="let&#39;s go together1" src="https://github.com/user-attachments/assets/6cebf150-6752-48a1-81d6-238ed86e6ed3" />
 
 👫 Семейный аккаунт
 Удобный способ покупать и хранить билеты для всей семьи
