@@ -12,6 +12,7 @@
    • Секция показывает версию из CFBundleShortVersionString.
 
 Архитектура
+MVVM 
 • UI: SwiftUI
    • SettingsView — экран профиля/настроек с редактированием через sheet. Делегирует выход через onLogout.
 • Модели:
