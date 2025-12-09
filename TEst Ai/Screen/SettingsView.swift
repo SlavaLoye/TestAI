@@ -39,6 +39,7 @@ struct SettingsView: View {
         return df
     }
 
+    
     var body: some View {
         Form {
             // Блок «Мой аккаунт»
