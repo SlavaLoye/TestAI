@@ -8,7 +8,7 @@ struct SplashView: View {
 
     var body: some View {
         ZStack {
-            // Градиентный фон, близкий к цвету иконки приложения
+            // Градиентный фон
             LinearGradient(
                 colors: [
                     Color(red: 0.29, green: 0.63, blue: 0.96), // #4AA1F5
@@ -19,11 +19,12 @@ struct SplashView: View {
             )
             .ignoresSafeArea()
 
-            // Логотип/картинка
-            Image("SplashImage") // добавьте эту картинку в Assets
+            // Фото на весь экран (вписано, сохраняет пропорции)
+            Image("SplashImage")
                 .resizable()
                 .scaledToFit()
-                .frame(maxWidth: 240, maxHeight: 240)
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .ignoresSafeArea()
                 .scaleEffect(scale)
                 .opacity(opacity)
                 .shadow(color: .black.opacity(0.15), radius: 12, x: 0, y: 6)
