@@ -1,0 +1,95 @@
+/* Search bar placeholder above the users list */
+"search.placeholder" = "Search";
+
+/* Toolbar: Logout button title */
+"logout.button.title" = "Log Out";
+
+/* Toolbar: Add button title */
+"add.button.title" = "Add";
+
+/* Navigation title for AddNameView screen */
+"new.user.title" = "New User";
+
+/* Login screen: title */
+"login.title" = "Sign in with Email";
+
+/* Login screen: email text field placeholder */
+"login.email.placeholder" = "Enter email";
+
+/* Login screen: invalid email message */
+"login.invalid.email" = "Invalid email";
+
+/* Login screen: sign in button */
+"login.signin" = "Sign In";
+
+/* Settings: Account section title */
+"settings.account.section" = "Account";
+
+/* Settings: About section title */
+"settings.about.section" = "About";
+
+/* Settings: Version row title */
+"settings.version.title" = "Version";
+
+/* Tab titles */
+"tab.people" = "People";
+"tab.transport" = "Subscriptions";
+"tab.home" = "Home";
+"tab.settings" = "Settings";
+/* New tabs */
+"tab.tickets" = "Tickets";
+"tab.map" = "Map";
+
+/* Names list: navigation title (if needed) */
+"names.title" = "People";
+
+/* Transport: navigation title (if needed) */
+"transport.title" = "Transport";
+
+/* Home: navigation title (if needed) */
+"home.title" = "Home";
+
+/* Settings: navigation title (if needed) */
+"settings.title" = "Settings";
+
+/* User profile screen */
+"profile.title" = "Profile";
+"birthdate.label" = "Birth date: %@";
+"gender.label" = "Gender: %@";
+
+/* Add New User screen */
+"name.section.title" = "Name";
+"birthdate.section.title" = "Birth date";
+"birthdate.picker.title" = "Select date";
+"gender.section.title" = "Gender";
+"gender.male" = "Male";
+"gender.female" = "Female";
+"gender.other" = "Other";
+"save.button.title" = "Save";
+
+/* Name text field placeholder */
+"name.textfield.placeholder" = "Enter name";
+
+/* Onboarding */
+"onboarding.page1.title" = "Welcome";
+"onboarding.page1.subtitle" = "Manage people, transport and home in one place.";
+"onboarding.page2.title" = "Map & Location";
+"onboarding.page2.subtitle" = "See traffic, your location and navigate faster.";
+"onboarding.next" = "Next";
+"onboarding.finish" = "Continue";
+
+/* Tickets/QR */
+"tickets.title" = "Tickets";
+"tickets.add" = "Add";
+"tickets.footer" = "Tap “Use” or just tap a type to show QR and spend one ride.";
+"tickets.remaining" = "Remaining: %d rides";
+"tickets.use" = "Use";
+"tickets.for.member" = "Tickets: %@";
+"qr.show.prompt" = "Show this QR code when boarding";
+"qr.generate.error" = "Failed to generate QR";
+"addticket.title" = "Add Ticket";
+"addticket.type.section" = "Ticket Type";
+"addticket.type.picker" = "Type";
+"addticket.quantity.section" = "Number of rides";
+"addticket.quantity.picker" = "Rides";
+"addticket.buy" = "Buy";

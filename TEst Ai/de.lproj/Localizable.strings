@@ -1,0 +1,93 @@
+/* Suchfeld-Platzhalter oberhalb der Benutzerliste */
+"search.placeholder" = "Suche";
+
+/* Symbolleisten-Button: Abmelden */
+"logout.button.title" = "Abmelden";
+
+/* Symbolleisten-Button: Hinzufügen */
+"add.button.title" = "Hinzufügen";
+
+/* Navigationstitel für den AddNameView */
+"new.user.title" = "Neuer Benutzer";
+
+/* Login-Bildschirm: Titel */
+"login.title" = "Mit E-Mail anmelden";
+
+/* Login-Bildschirm: Platzhalter für E-Mail-Feld */
+"login.email.placeholder" = "E-Mail eingeben";
+
+/* Login-Bildschirm: ungültige E-Mail-Meldung */
+"login.invalid.email" = "Ungültige E-Mail";
+
+/* Login-Bildschirm: Anmelde-Button */
+"login.signin" = "Anmelden";
+
+/* Einstellungen: Abschnitt „Konto“ */
+"settings.account.section" = "Konto";
+
+/* Einstellungen: Abschnitt „Info“ */
+"settings.about.section" = "Info";
+
+/* Einstellungen: Titel der Versionszeile */
+"settings.version.title" = "Version";
+
+/* Tab-Titel */
+"tab.people" = "Personen";
+"tab.transport" = "Abos";
+"tab.home" = "Start";
+"tab.settings" = "Einstellungen";
+/* Neue Tabs */
+"tab.tickets" = "Tickets";
+"tab.map" = "Karte";
+
+/* Namenliste: Navigationstitel (falls benötigt) */
+"names.title" = "Personen";
+
+/* Transport: Navigationstitel (falls benötigt) */
+"transport.title" = "Verkehr";
+
+/* Home: Navigationstitel (falls benötigt) */
+"home.title" = "Start";
+
+/* Einstellungen: Navigationstitel (falls benötigt) */
+"settings.title" = "Einstellungen";
+
+/* Profilansicht des Benutzers */
+"profile.title" = "Profil";
+"birthdate.label" = "Geburtsdatum: %@";
+"gender.label" = "Geschlecht: %@";
+
+/* Bildschirm „Neuer Benutzer“ */
+"name.section.title" = "Name";
+"birthdate.section.title" = "Geburtsdatum";
+"birthdate.picker.title" = "Datum wählen";
+"gender.section.title" = "Geschlecht";
+"gender.male" = "Männlich";
+"gender.female" = "Weiblich";
+"gender.other" = "Divers";
+"save.button.title" = "Speichern";
+"name.textfield.placeholder" = "Name eingeben";
+
+/* Onboarding */
+"onboarding.page1.title" = "Willkommen";
+"onboarding.page1.subtitle" = "Verwalten Sie Personen, Verkehr und Zuhause an einem Ort.";
+"onboarding.page2.title" = "Karte & Standort";
+"onboarding.page2.subtitle" = "Sehen Sie Verkehr, Ihren Standort und navigieren Sie schneller.";
+"onboarding.next" = "Weiter";
+"onboarding.finish" = "Fortfahren";
+
+/* Tickets/QR */
+"tickets.title" = "Tickets";
+"tickets.add" = "Hinzufügen";
+"tickets.footer" = "Tippen Sie auf „Benutzen“ oder auf einen Typ, um den QR zu zeigen und eine Fahrt zu verbrauchen.";
+"tickets.remaining" = "Verbleibend: %d Fahrten";
+"tickets.use" = "Benutzen";
+"tickets.for.member" = "Tickets: %@";
+"qr.show.prompt" = "Zeigen Sie diesen QR-Code beim Einstieg";
+"qr.generate.error" = "QR konnte nicht erstellt werden";
+"addticket.title" = "Ticket hinzufügen";
+"addticket.type.section" = "Tickettyp";
+"addticket.type.picker" = "Typ";
+"addticket.quantity.section" = "Anzahl der Fahrten";
+"addticket.quantity.picker" = "Fahrten";
+"addticket.buy" = "Kaufen";

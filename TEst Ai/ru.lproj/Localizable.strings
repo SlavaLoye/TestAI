@@ -1,0 +1,93 @@
+/* Строка поиска над списком пользователей */
+"search.placeholder" = "Поиск";
+
+/* Панель инструментов: кнопка «Выйти» */
+"logout.button.title" = "Выйти";
+
+/* Панель инструментов: кнопка «Добавить» */
+"add.button.title" = "Добавить";
+
+/* Заголовок навигации для экрана добавления пользователя */
+"new.user.title" = "Новый пользователь";
+
+/* Экран входа: заголовок */
+"login.title" = "Вход по email";
+
+/* Экран входа: плейсхолдер поля email */
+"login.email.placeholder" = "Введите email";
+
+/* Экран входа: сообщение о некорректном email */
+"login.invalid.email" = "Некорректный email";
+
+/* Экран входа: кнопка входа */
+"login.signin" = "Войти";
+
+/* Настройки: заголовок секции «Учетная запись» */
+"settings.account.section" = "Учетная запись";
+
+/* Настройки: заголовок секции «О приложении» */
+"settings.about.section" = "О приложении";
+
+/* Настройки: заголовок строки «Версия» */
+"settings.version.title" = "Версия";
+
+/* Заголовки вкладок */
+"tab.people" = "Моя семья ";
+"tab.transport" = "Подписки";
+"tab.home" = "Дом";
+"tab.settings" = "Настройки";
+/* Новые вкладки */
+"tab.tickets" = "Билеты";
+"tab.map" = "Карта";
+
+/* Список имен: заголовок навигации (если используется) */
+"names.title" = "Я и моя семья";
+
+/* Транспорт: заголовок навигации (если используется) */
+"transport.title" = "Транспорт";
+
+/* Дом: заголовок навигации (если используется) */
+"home.title" = "Дом";
+
+/* Настройки: заголовок навигации (если используется) */
+"settings.title" = "Настройки";
+
+/* Экран профиля пользователя */
+"profile.title" = "Профиль";
+"birthdate.label" = "Дата рождения: %@";
+"gender.label" = "Пол: %@";
+
+/* Экран «Новый пользователь» */
+"name.section.title" = "Имя";
+"birthdate.section.title" = "Дата рождения";
+"birthdate.picker.title" = "Выберите дату";
+"gender.section.title" = "Пол";
+"gender.male" = "Мужской";
+"gender.female" = "Женский";
+"gender.other" = "Другое";
+"save.button.title" = "Сохранить";
+"name.textfield.placeholder" = "Введите имя";
+
+/* Онбординг */
+"onboarding.page1.title" = "Добро пожаловать";
+"onboarding.page1.subtitle" = "Управляйте семьёй, транспортом и домом в одном месте.";
+"onboarding.page2.title" = "Карта и геолокация";
+"onboarding.page2.subtitle" = "Смотрите трафик, своё местоположение и добирайтесь быстрее.";
+"onboarding.next" = "Далее";
+"onboarding.finish" = "Продолжить";
+
+/* Билеты/QR */
+"tickets.title" = "Билеты";
+"tickets.add" = "Добавить";
+"tickets.footer" = "Нажмите «Использовать» или просто тапните по типу, чтобы показать QR и списать одну поездку.";
+"tickets.remaining" = "Остаток: %d поездок";
+"tickets.use" = "Использовать";
+"tickets.for.member" = "Билеты: %@";
+"qr.show.prompt" = "Покажите этот QR-код при входе в транспорт";
+"qr.generate.error" = "Не удалось создать QR";
+"addticket.title" = "Добавить билет";
+"addticket.type.section" = "Тип билета";
+"addticket.type.picker" = "Тип";
+"addticket.quantity.section" = "Количество поездок";
+"addticket.quantity.picker" = "Поездок";
+"addticket.buy" = "Купить";

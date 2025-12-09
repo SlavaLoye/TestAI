@@ -11,7 +11,7 @@ import SwiftUI
 struct TEst_AiApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+             AppRootView()
         }
     }
 }

@@ -29,9 +29,33 @@
 		B0644F5F2EE5A36300643E2E /* TEst AiUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "TEst AiUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		B022EDFF2EE8254B00DFEF6D /* Exceptions for "TEst Ai" folder in "TEst Ai" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"/Localized: Localizable.strings",
+			);
+			target = B0644F472EE5A36000643E2E /* TEst Ai */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+		B022EE002EE8254B00DFEF6D /* Exceptions for "TEst Ai" folder in "Compile Sources" phase from "TEst Ai" target */ = {
+			isa = PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet;
+			buildPhase = B0644F442EE5A36000643E2E /* Sources */;
+			membershipExceptions = (
+				"/Localized: Localizable.strings",
+			);
+		};
+/* End PBXFileSystemSynchronizedGroupBuildPhaseMembershipExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		B0644F4A2EE5A36000643E2E /* TEst Ai */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				B022EDFF2EE8254B00DFEF6D /* Exceptions for "TEst Ai" folder in "TEst Ai" target */,
+				B022EE002EE8254B00DFEF6D /* Exceptions for "TEst Ai" folder in "Compile Sources" phase from "TEst Ai" target */,
+			);
 			path = "TEst Ai";
 			sourceTree = "<group>";
 		};
@@ -191,7 +215,8 @@
 			hasScannedForEncodings = 0;
 			knownRegions = (
 				en,
-				Base,
+				ru,
+				de,
 			);
 			mainGroup = B0644F3F2EE5A36000643E2E;
 			minimizedProjectReferenceProxies = 1;
@@ -400,6 +425,9 @@
 				DEVELOPMENT_TEAM = 5YVJVJ4SST;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "TEst-Ai-Info.plist";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "\"Ваше местоположение используется для отслеживания и уведомлений, даже когда приложение не активно.\"";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = " \"Ваше местоположение используется для отображения на карте и центрирования рядом с вами.\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -432,6 +460,9 @@
 				DEVELOPMENT_TEAM = 5YVJVJ4SST;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "TEst-Ai-Info.plist";
+				INFOPLIST_KEY_NSLocationAlwaysAndWhenInUseUsageDescription = "\"Ваше местоположение используется для отслеживания и уведомлений, даже когда приложение не активно.\"";
+				INFOPLIST_KEY_NSLocationWhenInUseUsageDescription = " \"Ваше местоположение используется для отображения на карте и центрирования рядом с вами.\"";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
