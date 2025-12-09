@@ -58,6 +58,7 @@ struct LoginView: View {
 
     private var isEmailValid: Bool {
         // Простая валидация email через регулярку
+        
         let pattern =
         #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
         let pred = NSPredicate(format: "SELF MATCHES[c] %@", pattern)
