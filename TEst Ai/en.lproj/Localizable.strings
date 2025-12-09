@@ -44,7 +44,7 @@
 "names.title" = "People";
 
 /* Transport: navigation title (if needed) */
-"transport.title" = "Transport";
+"transport.title" = "Subscription";
 
 /* Home: navigation title (if needed) */
 "home.title" = "Home";
@@ -93,3 +93,7 @@
 "addticket.quantity.section" = "Number of rides";
 "addticket.quantity.picker" = "Rides";
 "addticket.buy" = "Buy";
+
+"tickets.summary.bus" = "bus — %d";
+"tickets.summary.metro" = "metro — %d";
+"tab.profile" = "My Profile";

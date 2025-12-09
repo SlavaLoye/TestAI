@@ -1,4 +1,5 @@
 /* Строка поиска над списком пользователей */
+
 "search.placeholder" = "Поиск";
 
 /* Панель инструментов: кнопка «Выйти» */
@@ -44,7 +45,7 @@
 "names.title" = "Я и моя семья";
 
 /* Транспорт: заголовок навигации (если используется) */
-"transport.title" = "Транспорт";
+"transport.title" = "Подписки";
 
 /* Дом: заголовок навигации (если используется) */
 "home.title" = "Дом";
@@ -91,3 +92,7 @@
 "addticket.quantity.section" = "Количество поездок";
 "addticket.quantity.picker" = "Поездок";
 "addticket.buy" = "Купить";
+
+"tickets.summary.bus" = "автобус — %d";
+"tickets.summary.metro" = "метро — %d";
+"tab.profile" = "Профиль";

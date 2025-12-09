@@ -67,19 +67,21 @@ struct NamesListView: View {
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(user.name)
                                     .font(isPrimary(user) ? .headline : .body)
-
-                                // Подзаголовок с билетами: "bus - 30, metro - 10"
+                            
+                                // Подзаголовок с билетами: "<Title> — <count>, <Title> — <count>"
                                 if let summary = ticketSummary[user.id] {
                                     let parts = [
+                                        
                                         summary.bus > 0 ? "bus - \(summary.bus)" : nil,
                                         summary.metro > 0 ? "metro - \(summary.metro)" : nil
                                     ].compactMap { $0 }
+
                                     if !parts.isEmpty {
                                         Text(parts.joined(separator: ", "))
                                             .font(.caption)
                                             .foregroundStyle(.secondary)
                                     } else {
-                                        Text("Нет билетов")
+                                        Text(NSLocalizedString("tickets.none", comment: "No tickets"))
                                             .font(.caption)
                                             .foregroundStyle(.tertiary)
                                     }
