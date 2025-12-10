@@ -6,79 +6,35 @@
 //
 
 import SwiftUI
-import CoreLocation
 import MapKit
 
-private enum TransportMode: Hashable, CaseIterable {
-    case transit
-    case automobile
-    case walking
-
-    var title: String {
-        switch self {
-        case .transit: return "Транспорт"
-        case .automobile: return "Авто"
-        case .walking: return "Пешком"
-        }
-    }
-
-    var mkType: MKDirectionsTransportType {
-        switch self {
-        case .transit: return .transit
-        case .automobile: return .automobile
-        case .walking: return .walking
-        }
-    }
-}
-
 struct TransportView: View {
-    // Начальный регион — Санкт‑Петербург
-    @State private var region = MKCoordinateRegion(
-        center: CLLocationCoordinate2D(latitude: 59.9343, longitude: 30.3351),
-        span: MKCoordinateSpan(latitudeDelta: 0.08, longitudeDelta: 0.08)
-    )
-
-    // Локация пользователя
-    @State private var userCoordinate: CLLocationCoordinate2D?
-    @State private var locationAuthStatus: CLAuthorizationStatus = .notDetermined
-    private let locationProvider = LocationProvider()
-
-    // Поиск
-    @State private var query: String = ""
-    @State private var results: [MKMapItem] = []
-    @State private var isSearching: Bool = false
-    @State private var activeSearch: MKLocalSearch?
-
-    // Цель маршрута
-    @State private var destination: CLLocationCoordinate2D?
-
-    // Тип транспорта (обёртка для Picker)
-    @State private var selectedMode: TransportMode = .transit
+    @StateObject private var vm = TransportViewModel()
 
     var body: some View {
         ZStack {
             TrafficMapView(
-                region: $region,
+                region: $vm.region,
                 showsUserLocation: true,
-                startCoordinate: userCoordinate,
-                endCoordinate: destination,
-                transportType: selectedMode.mkType
+                startCoordinate: vm.userCoordinate,
+                endCoordinate: vm.destination,
+                transportType: vm.selectedMode.mkType
             )
             .ignoresSafeArea()
 
             VStack(spacing: 8) {
                 // Панель поиска
                 HStack(spacing: 8) {
-                    TextField("Поиск адреса или места", text: $query)
+                    TextField("Поиск адреса или места", text: $vm.query)
                         .textInputAutocapitalization(.never)
                         .autocorrectionDisabled(true)
                         .padding(10)
                         .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 10, style: .continuous))
 
                     Button {
-                        performSearch()
+                        vm.performSearch()
                     } label: {
-                        if isSearching {
+                        if vm.isSearching {
                             ProgressView()
                                 .progressViewStyle(.circular)
                                 .tint(.white)
@@ -94,12 +50,11 @@ struct TransportView: View {
                                 .foregroundStyle(.white)
                         }
                     }
-                    .disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSearching)
+                    .disabled(vm.query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || vm.isSearching)
 
-                    // Кнопка отмены поиска (сбрасывает результаты и очищает поле)
-                    if isSearching || !results.isEmpty || !query.isEmpty {
+                    if vm.isSearching || !vm.results.isEmpty || !vm.query.isEmpty {
                         Button("Отмена") {
-                            cancelSearch()
+                            vm.cancelSearch()
                         }
                         .buttonStyle(.bordered)
                     }
@@ -108,7 +63,7 @@ struct TransportView: View {
                 .padding(.top, 8)
 
                 // Переключатель типа транспорта
-                Picker("Тип", selection: $selectedMode) {
+                Picker("Тип", selection: $vm.selectedMode) {
                     Text(TransportMode.transit.title).tag(TransportMode.transit)
                     Text(TransportMode.automobile.title).tag(TransportMode.automobile)
                     Text(TransportMode.walking.title).tag(TransportMode.walking)
@@ -117,13 +72,12 @@ struct TransportView: View {
                 .padding(.horizontal)
 
                 // Список результатов поиска
-                if !results.isEmpty {
+                if !vm.results.isEmpty {
                     ScrollView {
                         VStack(spacing: 8) {
-                            ForEach(results, id: \.self) { item in
+                            ForEach(vm.results, id: \.self) { item in
                                 ResultRow(item: item) {
-                                    // Маршрут от текущей локации до выбранного места
-                                    destination = item.placemark.coordinate
+                                    vm.destination = item.placemark.coordinate
                                 }
                             }
                         }
@@ -140,7 +94,7 @@ struct TransportView: View {
                 // Кнопки управления масштабом и центровкой
                 HStack(spacing: 12) {
                     Button {
-                        centerOnUser()
+                        vm.centerOnUser()
                     } label: {
                         Image(systemName: "location.fill")
                             .font(.title2)
@@ -150,7 +104,7 @@ struct TransportView: View {
                     .accessibilityLabel("Моё местоположение")
 
                     Button {
-                        zoom(by: 0.5)
+                        vm.zoom(by: 0.5)
                     } label: {
                         Image(systemName: "plus.magnifyingglass")
                             .font(.title2)
@@ -159,7 +113,7 @@ struct TransportView: View {
                     }
 
                     Button {
-                        zoom(by: 2.0)
+                        vm.zoom(by: 2.0)
                     } label: {
                         Image(systemName: "minus.magnifyingglass")
                             .font(.title2)
@@ -172,94 +126,9 @@ struct TransportView: View {
                 .frame(maxWidth: .infinity, alignment: .trailing)
             }
         }
-        .onAppear {
-            locationProvider.start { status, coordinate in
-                if let status = status {
-                    locationAuthStatus = status
-                }
-                if let coordinate = coordinate {
-                    userCoordinate = coordinate
-                }
-            }
-        }
-        .onDisappear {
-            locationProvider.stop()
-            activeSearch?.cancel()
-            activeSearch = nil
-        }
+        .onAppear { vm.start() }
+        .onDisappear { vm.stop() }
         .navigationBarTitleDisplayMode(.inline)
-    }
-
-    // MARK: - Search
-
-    private func performSearch() {
-        let q = query.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !q.isEmpty else { return }
-
-        isSearching = true
-        results = []
-        activeSearch?.cancel()
-
-        let request = MKLocalSearch.Request()
-        request.naturalLanguageQuery = q
-        request.region = region // ограничим текущим регионом карты для релевантности
-
-        let search = MKLocalSearch(request: request)
-        activeSearch = search
-        search.start { response, error in
-            defer {
-                isSearching = false
-                activeSearch = nil
-            }
-            if let error = error {
-                print("Search error: \(error.localizedDescription)")
-                return
-            }
-            results = response?.mapItems ?? []
-        }
-    }
-
-    private func cancelSearch() {
-        activeSearch?.cancel()
-        activeSearch = nil
-        isSearching = false
-        results = []
-        query = ""
-        // destination НЕ трогаем по вашему запросу
-    }
-
-    // MARK: - Map controls
-
-    private func zoom(by factor: Double) {
-        let newSpan = MKCoordinateSpan(
-            latitudeDelta: max(region.span.latitudeDelta * factor, 0.0005),
-            longitudeDelta: max(region.span.longitudeDelta * factor, 0.0005)
-        )
-        region.span = newSpan
-    }
-
-    private func centerOnUser() {
-        if let coord = userCoordinate {
-            withAnimation {
-                region = MKCoordinateRegion(
-                    center: coord,
-                    span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
-                )
-            }
-            return
-        }
-
-        // Одноразовый запрос координаты, затем центрируемся
-        locationProvider.requestOneShot { coord in
-            guard let coord = coord else { return }
-            userCoordinate = coord
-            withAnimation {
-                region = MKCoordinateRegion(
-                    center: coord,
-                    span: MKCoordinateSpan(latitudeDelta: 0.02, longitudeDelta: 0.02)
-                )
-            }
-        }
     }
 }
 
@@ -296,64 +165,6 @@ private struct ResultRow: View {
         .padding(10)
         .background(Color(.secondarySystemBackground))
         .clipShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
-    }
-}
-
-// Вспомогательный провайдер локации для получения координат в SwiftUI
-private final class LocationProvider: NSObject, CLLocationManagerDelegate {
-    private let manager = CLLocationManager()
-    private var onUpdate: ((CLAuthorizationStatus?, CLLocationCoordinate2D?) -> Void)?
-    private var oneShotCompletion: ((CLLocationCoordinate2D?) -> Void)?
-
-    override init() {
-        super.init()
-        manager.delegate = self
-        manager.desiredAccuracy = kCLLocationAccuracyBest
-    }
-
-    func start(onUpdate: @escaping (CLAuthorizationStatus?, CLLocationCoordinate2D?) -> Void) {
-        self.onUpdate = onUpdate
-        if CLLocationManager.authorizationStatus() == .notDetermined {
-            manager.requestWhenInUseAuthorization()
-        } else {
-            onUpdate(CLLocationManager.authorizationStatus(), nil)
-        }
-        manager.requestLocation()
-    }
-
-    func requestOneShot(_ completion: @escaping (CLLocationCoordinate2D?) -> Void) {
-        oneShotCompletion = completion
-        manager.requestLocation()
-    }
-
-    func stop() {
-        onUpdate = nil
-        oneShotCompletion = nil
-    }
-
-    // MARK: - CLLocationManagerDelegate
-
-    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
-        onUpdate?(status, nil)
-        if status == .authorizedWhenInUse || status == .authorizedAlways {
-            manager.requestLocation()
-        }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        let coord = locations.last?.coordinate
-        onUpdate?(nil, coord)
-        if let oneShot = oneShotCompletion {
-            oneShot(coord)
-            oneShotCompletion = nil
-        }
-    }
-
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        if let oneShot = oneShotCompletion {
-            oneShot(nil)
-            oneShotCompletion = nil
-        }
     }
 }
 
