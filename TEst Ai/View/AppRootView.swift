@@ -64,9 +64,9 @@ struct AppRootView: View {
 
             // Splash поверх всего, пока не завершится
             if !isSplashFinished {
-                SplashView(isFinished: $isSplashFinished)
-                    .transition(.opacity)
-                    .zIndex(1)
+               // SplashView(isFinished: $isSplashFinished)
+//                    .transition(.opacity)
+//                    .zIndex(1)
             }
         }
         // Важно: убираем обратную синхронизацию legacy -> ProfileStore,
