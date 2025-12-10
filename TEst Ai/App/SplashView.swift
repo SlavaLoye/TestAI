@@ -4,22 +4,23 @@ struct SplashView: View {
     @Binding var isFinished: Bool
 
     @State private var scale: CGFloat = 0.88
-    @State private var opacity: Double = 0.0
+    // Логотип виден сразу, убираем стартовую прозрачность
+    @State private var opacity: Double = 1.0
 
     var body: some View {
         ZStack {
-            // Градиентный фон
+            // Градиентный фон, подобранный под картинку
             LinearGradient(
                 colors: [
-                    Color(red: 0.29, green: 0.63, blue: 0.96), // #4AA1F5
-                    Color(red: 0.23, green: 0.54, blue: 0.93)  // #3B8AD0
+                    Color(red: 0.247, green: 0.639, blue: 1.000), // #3FA3FF (top)
+                    Color(red: 0.173, green: 0.482, blue: 0.918)  // #2C7BEA (bottom)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
             )
             .ignoresSafeArea()
 
-            // Фото на весь экран (вписано, сохраняет пропорции)
+            // Логотип
             Image("SplashImage")
                 .resizable()
                 .scaledToFit()
@@ -32,12 +33,10 @@ struct SplashView: View {
         }
         .onAppear {
             withAnimation(.easeOut(duration: 0.6)) {
-                opacity = 1.0
                 scale = 1.0
             }
-            // Держим экран ~1.2 сек и завершаем
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                withAnimation(.easeInOut(duration: 0.35)) {
+                withAnimation(.easeInOut(duration: 2.35)) {
                     isFinished = true
                 }
             }
