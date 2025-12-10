@@ -96,3 +96,7 @@
 "tickets.summary.bus" = "автобус — %d";
 "tickets.summary.metro" = "метро — %d";
 "tab.profile" = "Профиль";
+"logout.confirm.title" = "Выход";
+"logout.confirm.cancel"= "Отмена";
+"logout.confirm.ok" = "Выйти";
+"logout.confirm.message" = "Вы действительно хотите выйти?";

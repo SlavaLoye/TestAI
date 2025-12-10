@@ -17,6 +17,9 @@ struct NamesListView: View {
     // Кэш сводки билетов по пользователям: UUID -> (bus, metro)
     @State private var ticketSummary: [UUID: (bus: Int, metro: Int)] = [:]
 
+    // Состояние для подтверждения выхода
+    @State private var showLogoutConfirm: Bool = false
+
     let onLogout: () -> Void
 
     private var filteredUsers: [User] {
@@ -139,7 +142,9 @@ struct NamesListView: View {
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
-                Button(NSLocalizedString("logout.button.title", comment: "Выйти"), action: onLogout)
+                Button(NSLocalizedString("logout.button.title", comment: "Выйти")) {
+                    showLogoutConfirm = true
+                }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(NSLocalizedString("add.button.title", comment: "Добавить")) {
@@ -161,6 +166,17 @@ struct NamesListView: View {
                     .navigationTitle(NSLocalizedString("new.user.title", comment: "Новый пользователь"))
                 }
             }
+        }
+        .alert(
+            NSLocalizedString("logout.confirm.title", comment: "Выход"),
+            isPresented: $showLogoutConfirm
+        ) {
+            Button(NSLocalizedString("logout.confirm.cancel", comment: "Отмена"), role: .cancel) { }
+            Button(NSLocalizedString("logout.confirm.ok", comment: "Выйти"), role: .destructive) {
+                onLogout()
+            }
+        } message: {
+            Text(NSLocalizedString("logout.confirm.message", comment: "Вы действительно хотите выйти?"))
         }
         .onAppear {
             // Назначаем только если id пустой. Не переопределяем валидный id даже если он не в сид-списке.

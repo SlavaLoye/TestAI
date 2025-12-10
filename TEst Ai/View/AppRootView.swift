@@ -24,49 +24,37 @@ struct AppRootView: View {
     // Фиксированный UUID Вячеслава из сидов
     private let userAccauntID = "11111111-1111-1111-1111-111111111111"
 
-    // Состояние сплэша
-    @State private var isSplashFinished: Bool = false
-
     var body: some View {
-        ZStack {
-            Group {
-                if !isLoggedIn {
-                    NavigationStack {
-                        LoginView(onLogin: { isLoggedIn = true })
-                            .navigationTitle(NSLocalizedString("login.title", comment: "Sign in with Email"))
+        Group {
+            if !isLoggedIn {
+                NavigationStack {
+                    LoginView(onLogin: { isLoggedIn = true })
+                        .navigationTitle(NSLocalizedString("login.title", comment: "Sign in with Email"))
+                }
+            } else if !didFinishOnboarding {
+                OnboardingFlow(onFinish: { didFinishOnboarding = true })
+            } else {
+                MainTabView(
+                    vyacheslavID: userAccauntID,
+                    onLogout: {
+                        isLoggedIn = false
+                        didFinishOnboarding = false
                     }
-                } else if !didFinishOnboarding {
-                    OnboardingFlow(onFinish: { didFinishOnboarding = true })
-                } else {
-                    MainTabView(
-                        vyacheslavID: userAccauntID,
-                        onLogout: {
-                            isLoggedIn = false
-                            didFinishOnboarding = false
-                        }
-                    )
-                }
+                )
             }
-            .onAppear {
-                // Базовые значения профиля
-                ProfileStore.ensureDefaultProfile()
+        }
+        .onAppear {
+            // Базовые значения профиля
+            ProfileStore.ensureDefaultProfile()
 
-                // Зафиксировать главного пользователя на Вячеслава
-                if ProfileStore.primaryUserID != userAccauntID {
-                    ProfileStore.primaryUserID = userAccauntID
-                }
-
-                // Однонаправленная синхронизация legacy (для старых экранов/ключей)
-                if legacyPrimaryUserID != userAccauntID {
-                    legacyPrimaryUserID = userAccauntID
-                }
+            // Зафиксировать главного пользователя на Вячеслава
+            if ProfileStore.primaryUserID != userAccauntID {
+                ProfileStore.primaryUserID = userAccauntID
             }
 
-            // Splash поверх всего, пока не завершится
-            if !isSplashFinished {
-               // SplashView(isFinished: $isSplashFinished)
-//                    .transition(.opacity)
-//                    .zIndex(1)
+            // Однонаправленная синхронизация legacy (для старых экранов/ключей)
+            if legacyPrimaryUserID != userAccauntID {
+                legacyPrimaryUserID = userAccauntID
             }
         }
         // Важно: убираем обратную синхронизацию legacy -> ProfileStore,

@@ -19,6 +19,9 @@ struct SettingsView: View {
     // Состояние для показа редактора профиля
     @State private var showEditProfile: Bool = false
 
+    // Состояние для подтверждения выхода
+    @State private var showLogoutConfirm: Bool = false
+
     // Черновик редактируемых полей
     @State private var draftName: String = ""
     @State private var draftBirthDate: Date = {
@@ -115,7 +118,7 @@ struct SettingsView: View {
             // Настройки учетной записи
             Section("Учетная запись") {
                 Button(role: .destructive) {
-                    onLogout()
+                    showLogoutConfirm = true
                 } label: {
                     Label("Выйти", systemImage: "rectangle.portrait.and.arrow.right")
                 }
@@ -167,6 +170,17 @@ struct SettingsView: View {
                 }
             }
             .presentationDetents([.medium, .large])
+        }
+        .alert(
+            NSLocalizedString("logout.confirm.title", comment: "Выход"),
+            isPresented: $showLogoutConfirm
+        ) {
+            Button(NSLocalizedString("logout.confirm.cancel", comment: "Отмена"), role: .cancel) { }
+            Button(NSLocalizedString("logout.confirm.ok", comment: "Выйти"), role: .destructive) {
+                onLogout()
+            }
+        } message: {
+            Text(NSLocalizedString("logout.confirm.message", comment: "Вы действительно хотите выйти?"))
         }
         .onAppear {
             // Если главного нет — назначим "Вячеслава" или первого

@@ -97,3 +97,8 @@
 "tickets.summary.bus" = "bus — %d";
 "tickets.summary.metro" = "metro — %d";
 "tab.profile" = "My Profile";
+
+"logout.confirm.title" = "Logout";
+"logout.confirm.cancel" = "Cancel";
+"logout.confirm.ok" = "Logout";
+"logout.confirm.message" = "Are you sure you want to log out?";
