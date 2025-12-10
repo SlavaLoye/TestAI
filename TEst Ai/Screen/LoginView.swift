@@ -8,11 +8,12 @@
 import SwiftUI
 
 struct LoginView: View {
-    @State private var email: String = ""
+    @StateObject private var viewModel: LoginViewModel
     @FocusState private var emailFocused: Bool
-    @State private var showInvalidEmail: Bool = false
 
-    let onLogin: () -> Void
+    init(onLogin: @escaping () -> Void) {
+        _viewModel = StateObject(wrappedValue: LoginViewModel(onLogin: onLogin))
+    }
 
     var body: some View {
         VStack(spacing: 16) {
@@ -20,7 +21,7 @@ struct LoginView: View {
                 .font(.title2)
                 .bold()
 
-            TextField("Введите email", text: $email)
+            TextField("Введите email", text: $viewModel.email)
                 .keyboardType(.emailAddress)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled(true)
@@ -29,22 +30,24 @@ struct LoginView: View {
                 .cornerRadius(10)
                 .focused($emailFocused)
 
-            if showInvalidEmail {
+            if viewModel.showInvalidEmail {
                 Text("Некорректный email")
                     .font(.footnote)
                     .foregroundStyle(.red)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
 
-            Button(action: loginTapped) {
+            Button {
+                viewModel.login()
+            } label: {
                 Text("Войти")
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 12)
-                    .background(isEmailValid ? Color.accentColor : Color.gray.opacity(0.4))
+                    .background(viewModel.isEmailValid ? Color.accentColor : Color.gray.opacity(0.4))
                     .foregroundStyle(.white)
                     .cornerRadius(10)
             }
-            .disabled(!isEmailValid)
+            .disabled(!viewModel.isEmailValid)
 
             Spacer()
         }
@@ -53,23 +56,6 @@ struct LoginView: View {
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 emailFocused = true
             }
-        }
-    }
-
-    private var isEmailValid: Bool {
-        // Простая валидация email через регулярку
-        
-        let pattern =
-        #"^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$"#
-        let pred = NSPredicate(format: "SELF MATCHES[c] %@", pattern)
-        return pred.evaluate(with: email.trimmingCharacters(in: .whitespacesAndNewlines))
-    }
-
-    private func loginTapped() {
-        let valid = isEmailValid
-        showInvalidEmail = !valid
-        if valid {
-            onLogin()
         }
     }
 }

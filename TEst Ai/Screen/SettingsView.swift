@@ -13,7 +13,7 @@ struct SettingsView: View {
     // Зеркало старого ключа для совместимости
     @AppStorage("primaryUserID") private var legacyPrimaryUserID: String?
 
-    // Источник пользователей. Замените на ваше хранилище при необходимости.
+    // Источник пользователей из сидов (для отображения карточки «Мой аккаунт»)
     @State private var allUsers: [User] = UsersSeed.initial
 
     // Состояние для показа редактора профиля
@@ -22,6 +22,9 @@ struct SettingsView: View {
     // Состояние для подтверждения выхода
     @State private var showLogoutConfirm: Bool = false
 
+    // Профиль по MVVM
+    @StateObject private var profileVM = ProfileViewModel()
+
     // Черновик редактируемых полей
     @State private var draftName: String = ""
     @State private var draftBirthDate: Date = {
@@ -29,9 +32,10 @@ struct SettingsView: View {
     }()
     @State private var draftGender: Gender = .other
 
-    private var primaryUser: User? {
-        guard !ProfileStore.primaryUserID.isEmpty,
-              let uuid = UUID(uuidString: ProfileStore.primaryUserID) else { return nil }
+    // Текущий «главный» пользователь из сидов, если присутствует
+    private var primaryUserFromSeed: User? {
+        guard !profileVM.primaryUserID.isEmpty,
+              let uuid = UUID(uuidString: profileVM.primaryUserID) else { return nil }
         return allUsers.first(where: { $0.id == uuid })
     }
 
@@ -48,35 +52,31 @@ struct SettingsView: View {
             Section {
                 HStack(alignment: .center, spacing: 16) {
                     // Аватарка (иконка по полу и возрасту)
-                    Image(systemName: (primaryUser?.symbolNameConsideringAge) ?? "person.crop.circle.fill")
+                    Image(systemName: (primaryUserFromSeed?.symbolNameConsideringAge) ?? "person.crop.circle.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 56, height: 56)
-                        .foregroundStyle(primaryUser?.colorConsideringAge ?? .gray)
+                        .foregroundStyle(primaryUserFromSeed?.colorConsideringAge ?? .gray)
                         .background(Color(.secondarySystemBackground))
                         .clipShape(Circle())
 
                     VStack(alignment: .leading, spacing: 6) {
-                        Text(primaryUser?.name ?? "Мой аккаунт")
+                        // Имя берем из профиля (источник правды), если не пустое, иначе fallback к сид-пользователю
+                        Text(!profileVM.name.isEmpty ? profileVM.name : (primaryUserFromSeed?.name ?? "Мой аккаунт"))
                             .font(.headline)
 
-                        if let user = primaryUser {
-                            HStack(spacing: 6) {
-                                Image(systemName: "calendar")
-                                    .foregroundStyle(.secondary)
-                                Text(dateFormatter.string(from: user.birthDate))
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                            HStack(spacing: 6) {
-                                Image(systemName: "person.2")
-                                    .foregroundStyle(.secondary)
-                                Text(user.gender.title)
-                                    .font(.subheadline)
-                                    .foregroundStyle(.secondary)
-                            }
-                        } else {
-                            Text("Выберите главного пользователя в «Моя семья»")
+                        // Доп. сведения: дата и пол — из профиля
+                        HStack(spacing: 6) {
+                            Image(systemName: "calendar")
+                                .foregroundStyle(.secondary)
+                            Text(dateFormatter.string(from: profileVM.birthDate))
+                                .font(.subheadline)
+                                .foregroundStyle(.secondary)
+                        }
+                        HStack(spacing: 6) {
+                            Image(systemName: "person.2")
+                                .foregroundStyle(.secondary)
+                            Text(profileVM.gender.title)
                                 .font(.subheadline)
                                 .foregroundStyle(.secondary)
                         }
@@ -85,14 +85,14 @@ struct SettingsView: View {
                     Spacer()
 
                     Button {
-                        prepareDraftFromPrimary()
+                        prepareDraftFromProfile()
                         showEditProfile = true
                     } label: {
                         Label("Редактировать", systemImage: "square.and.pencil")
                             .labelStyle(.titleAndIcon)
-                            .font(.subheadline) // немного меньше шрифт
+                            .font(.subheadline)
                             .padding(.horizontal, 10)
-                            .padding(.vertical, 6) // компактнее по высоте
+                            .padding(.vertical, 6)
                             .background(
                                 RoundedRectangle(cornerRadius: 10, style: .continuous)
                                     .fill(Color(.secondarySystemBackground))
@@ -102,13 +102,13 @@ struct SettingsView: View {
                                     .stroke(Color.gray.opacity(0.25), lineWidth: 1)
                             )
                     }
-                    .buttonStyle(.plain) // кастомный вид без системного отступа
+                    .buttonStyle(.plain)
                     .contentShape(Rectangle())
                 }
                 .padding(.vertical, 6)
                 .contentShape(Rectangle())
                 .onTapGesture {
-                    prepareDraftFromPrimary()
+                    prepareDraftFromProfile()
                     showEditProfile = true
                 }
             } header: {
@@ -162,7 +162,7 @@ struct SettingsView: View {
                     }
                     ToolbarItem(placement: .confirmationAction) {
                         Button("Сохранить") {
-                            saveDraftIntoPrimary()
+                            saveDraftIntoProfile()
                             showEditProfile = false
                         }
                         .disabled(draftName.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty)
@@ -183,64 +183,43 @@ struct SettingsView: View {
             Text(NSLocalizedString("logout.confirm.message", comment: "Вы действительно хотите выйти?"))
         }
         .onAppear {
-            // Если главного нет — назначим "Вячеслава" или первого
-            if ProfileStore.primaryUserID.isEmpty {
+            // Обеспечим дефолты и загрузим профиль
+            profileVM.load()
+
+            // Если главного нет — назначим "Вячеслава" или первого из сидов
+            if profileVM.primaryUserID.isEmpty {
                 if let vyacheslav = allUsers.first(where: { $0.name == "Вячеслав" }) {
-                    ProfileStore.primaryUserID = vyacheslav.id.uuidString
+                    profileVM.primaryUserID = vyacheslav.id.uuidString
+                    profileVM.save()
                     legacyPrimaryUserID = vyacheslav.id.uuidString
                 } else if let first = allUsers.first {
-                    ProfileStore.primaryUserID = first.id.uuidString
+                    profileVM.primaryUserID = first.id.uuidString
+                    profileVM.save()
                     legacyPrimaryUserID = first.id.uuidString
                 }
             } else {
-                // Синхронизируем зеркало старого ключа
-                if legacyPrimaryUserID != ProfileStore.primaryUserID {
-                    legacyPrimaryUserID = ProfileStore.primaryUserID
+                // Однонаправленная синхронизация legacy (для совместимости)
+                if legacyPrimaryUserID != profileVM.primaryUserID {
+                    legacyPrimaryUserID = profileVM.primaryUserID
                 }
             }
         }
     }
 
-    private func prepareDraftFromPrimary() {
-        if let user = primaryUser {
-            draftName = user.name
-            draftBirthDate = user.birthDate
-            draftGender = user.gender
-        } else {
-            draftName = ""
-            draftBirthDate = Calendar.current.date(byAdding: .year, value: -18, to: Date()) ?? Date()
-            draftGender = .other
-        }
+    private func prepareDraftFromProfile() {
+        draftName = profileVM.name
+        draftBirthDate = profileVM.birthDate
+        draftGender = profileVM.gender
     }
 
-    private func saveDraftIntoPrimary() {
+    private func saveDraftIntoProfile() {
         let trimmed = draftName.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !trimmed.isEmpty else { return }
 
-        if var user = primaryUser {
-            user.name = trimmed
-            user.birthDate = draftBirthDate
-            user.gender = draftGender
-            // Обновим в массиве
-            if let idx = allUsers.firstIndex(where: { $0.id == user.id }) {
-                allUsers[idx] = user
-            }
-        } else {
-            // Если главного нет — создадим нового и назначим
-            let newUser = User(name: trimmed, birthDate: draftBirthDate, gender: draftGender)
-            allUsers.append(newUser)
-            ProfileStore.primaryUserID = newUser.id.uuidString
-            legacyPrimaryUserID = newUser.id.uuidString
-        }
-        // В реальном приложении здесь сохраните в ваше хранилище
-    }
-
-    private func colorForGender(_ gender: Gender?) -> Color {
-        switch gender {
-        case .some(.female): return .pink
-        case .some(.male): return .blue
-        default: return .gray
-        }
+        profileVM.name = trimmed
+        profileVM.birthDate = draftBirthDate
+        profileVM.gender = draftGender
+        profileVM.save()
     }
 }
 
