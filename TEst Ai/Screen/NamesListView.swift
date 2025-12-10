@@ -8,25 +8,9 @@
 import SwiftUI
 
 struct NamesListView: View {
-    @State private var users: [User] = UsersSeed.initial
-    @State private var searchText: String = ""
-
-    // Зеркало старого ключа для совместимости
-    @AppStorage("primaryUserID") private var legacyPrimaryUserID: String?
-
-    // Кэш сводки билетов по пользователям: UUID -> (bus, metro)
-    @State private var ticketSummary: [UUID: (bus: Int, metro: Int)] = [:]
-
-    // Состояние для подтверждения выхода
-    @State private var showLogoutConfirm: Bool = false
+    @StateObject private var vm = NamesListViewModel()
 
     let onLogout: () -> Void
-
-    private var filteredUsers: [User] {
-        let query = searchText.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !query.isEmpty else { return users }
-        return users.filter { $0.name.localizedCaseInsensitiveContains(query) }
-    }
 
     var body: some View {
         VStack(spacing: 8) {
@@ -34,12 +18,12 @@ struct NamesListView: View {
             HStack(spacing: 8) {
                 Image(systemName: "magnifyingglass")
                     .foregroundStyle(.secondary)
-                TextField(NSLocalizedString("search.placeholder", comment: "Поиск"), text: $searchText)
+                TextField(NSLocalizedString("search.placeholder", comment: "Поиск"), text: $vm.searchText)
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled(true)
-                if !searchText.isEmpty {
+                if !vm.searchText.isEmpty {
                     Button {
-                        searchText = ""
+                        vm.searchText = ""
                     } label: {
                         Image(systemName: "xmark.circle.fill")
                             .foregroundStyle(.secondary)
@@ -53,13 +37,13 @@ struct NamesListView: View {
             .padding(.horizontal)
 
             List {
-                ForEach(filteredUsers) { user in
+                ForEach(vm.filteredUsers) { user in
                     NavigationLink {
                         UserDetailView(user: user)
                     } label: {
                         HStack(spacing: 8) {
                             // Метка главного пользователя
-                            if isPrimary(user) {
+                            if vm.isPrimary(user) {
                                 Image(systemName: "star.fill")
                                     .foregroundStyle(.yellow)
                             }
@@ -69,12 +53,11 @@ struct NamesListView: View {
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(user.name)
-                                    .font(isPrimary(user) ? .headline : .body)
-                            
+                                    .font(vm.isPrimary(user) ? .headline : .body)
+
                                 // Подзаголовок с билетами: "<Title> — <count>, <Title> — <count>"
-                                if let summary = ticketSummary[user.id] {
+                                if let summary = vm.ticketSummary[user.id] {
                                     let parts = [
-                                        
                                         summary.bus > 0 ? "bus - \(summary.bus)" : nil,
                                         summary.metro > 0 ? "metro - \(summary.metro)" : nil
                                     ].compactMap { $0 }
@@ -100,15 +83,15 @@ struct NamesListView: View {
                         }
                         .contentShape(Rectangle())
                         .contextMenu {
-                            if isPrimary(user) {
+                            if vm.isPrimary(user) {
                                 Button {
-                                    unsetPrimary()
+                                    vm.unsetPrimary()
                                 } label: {
                                     Label("Снять главный", systemImage: "star.slash.fill")
                                 }
                             } else {
                                 Button {
-                                    setPrimary(user)
+                                    vm.setPrimary(user)
                                 } label: {
                                     Label("Сделать главным", systemImage: "star.fill")
                                 }
@@ -116,7 +99,7 @@ struct NamesListView: View {
                         }
                     }
                     .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        if isPrimary(user) {
+                        if vm.isPrimary(user) {
                             // Запрещаем удаление главного — не показываем destructive кнопку
                             Button {
                                 // Ничего: можно подсветить, что это главный
@@ -126,7 +109,7 @@ struct NamesListView: View {
                             .tint(.gray)
                         } else {
                             Button(role: .destructive) {
-                                deleteUser(user)
+                                vm.deleteUser(user)
                             } label: {
                                 Label("Удалить", systemImage: "trash.fill")
                             }
@@ -134,34 +117,22 @@ struct NamesListView: View {
                     }
                     .onAppear {
                         // Обновим сводку для пользователя при появлении строки
-                        refreshSummary(for: user)
+                        vm.refreshSummary(for: user)
                     }
                 }
-                .onDelete(perform: delete)
+                .onDelete(perform: vm.delete)
             }
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button(NSLocalizedString("logout.button.title", comment: "Выйти")) {
-                    showLogoutConfirm = true
+                    vm.showLogoutConfirm = true
                 }
             }
             ToolbarItem(placement: .topBarTrailing) {
                 NavigationLink(NSLocalizedString("add.button.title", comment: "Добавить")) {
                     AddNameView { newUser in
-                        // Нормализуем имя и добавляем пользователя
-                        let trimmed = newUser.name.trimmingCharacters(in: .whitespacesAndNewlines)
-                        guard !trimmed.isEmpty else { return }
-                        var userToAdd = newUser
-                        userToAdd.name = trimmed
-                        users.append(userToAdd)
-                        // Если главного ещё нет — назначим только что добавленного
-                        if ProfileStore.primaryUserID.isEmpty {
-                            ProfileStore.primaryUserID = userToAdd.id.uuidString
-                            legacyPrimaryUserID = userToAdd.id.uuidString
-                        }
-                        // И сразу обновим сводку для нового пользователя
-                        refreshSummary(for: userToAdd)
+                        vm.addUser(newUser)
                     }
                     .navigationTitle(NSLocalizedString("new.user.title", comment: "Новый пользователь"))
                 }
@@ -169,7 +140,7 @@ struct NamesListView: View {
         }
         .alert(
             NSLocalizedString("logout.confirm.title", comment: "Выход"),
-            isPresented: $showLogoutConfirm
+            isPresented: $vm.showLogoutConfirm
         ) {
             Button(NSLocalizedString("logout.confirm.cancel", comment: "Отмена"), role: .cancel) { }
             Button(NSLocalizedString("logout.confirm.ok", comment: "Выйти"), role: .destructive) {
@@ -179,100 +150,8 @@ struct NamesListView: View {
             Text(NSLocalizedString("logout.confirm.message", comment: "Вы действительно хотите выйти?"))
         }
         .onAppear {
-            // Назначаем только если id пустой. Не переопределяем валидный id даже если он не в сид-списке.
-            if ProfileStore.primaryUserID.isEmpty {
-                if let vyacheslav = users.first(where: { $0.name == "Вячеслав" }) {
-                    ProfileStore.primaryUserID = vyacheslav.id.uuidString
-                    legacyPrimaryUserID = vyacheslav.id.uuidString
-                } else if let first = users.first {
-                    ProfileStore.primaryUserID = first.id.uuidString
-                    legacyPrimaryUserID = first.id.uuidString
-                }
-            } else {
-                // Синхронизируем зеркало старого ключа (однонаправленно)
-                if legacyPrimaryUserID != ProfileStore.primaryUserID {
-                    legacyPrimaryUserID = ProfileStore.primaryUserID
-                }
-            }
-
-            // Массово обновим сводку для всех пользователей при входе на экран
-            refreshAllSummaries()
+            vm.onAppear()
         }
-    }
-
-    private func refreshSummary(for user: User) {
-        let records = TicketWalletStore.load(memberID: user.id.uuidString)
-        let bus = records.first(where: { $0.type == .bus })?.remainingRides ?? 0
-        let metro = records.first(where: { $0.type == .metro })?.remainingRides ?? 0
-        ticketSummary[user.id] = (bus: bus, metro: metro)
-    }
-
-    private func refreshAllSummaries() {
-        var dict: [UUID: (bus: Int, metro: Int)] = [:]
-        for user in users {
-            let records = TicketWalletStore.load(memberID: user.id.uuidString)
-            let bus = records.first(where: { $0.type == .bus })?.remainingRides ?? 0
-            let metro = records.first(where: { $0.type == .metro })?.remainingRides ?? 0
-            dict[user.id] = (bus: bus, metro: metro)
-        }
-        ticketSummary = dict
-    }
-
-    private func deleteUser(_ user: User) {
-        // Защита: не удаляем главного
-        guard !isPrimary(user) else { return }
-        users.removeAll { $0.id == user.id }
-        // Если удалили кого-то ещё — сводку обновим
-        ticketSummary[user.id] = nil
-    }
-
-    private func isPrimary(_ user: User) -> Bool {
-        ProfileStore.primaryUserID == user.id.uuidString
-    }
-
-    private func setPrimary(_ user: User) {
-        ProfileStore.primaryUserID = user.id.uuidString
-        legacyPrimaryUserID = user.id.uuidString
-    }
-
-    private func unsetPrimary() {
-        // Временно снимаем — но чтобы UI не остался без главного, сразу назначим "Вячеслава" или первого
-        if let vyacheslav = users.first(where: { $0.name == "Вячеслав" }) {
-            setPrimary(vyacheslav)
-        } else if let first = users.first {
-            setPrimary(first)
-        } else {
-            // Если список пуст — очистим оба ключа
-            ProfileStore.primaryUserID = ""
-            legacyPrimaryUserID = nil
-        }
-    }
-
-    private func delete(at offsets: IndexSet) {
-        // Индексы видимого (фильтрованного) списка
-        let idsToDelete = offsets
-            .map { filteredUsers[$0].id }
-            // Фильтруем: не удаляем главного
-            .filter { $0.uuidString != ProfileStore.primaryUserID }
-
-        guard !idsToDelete.isEmpty else { return }
-
-        users.removeAll { idsToDelete.contains($0.id) }
-
-        // Если после удаления текущий главный отсутствует — переназначим
-        if users.first(where: { $0.id.uuidString == ProfileStore.primaryUserID }) == nil {
-            if let vyacheslav = users.first(where: { $0.name == "Вячеслав" }) {
-                setPrimary(vyacheslav)
-            } else if let first = users.first {
-                setPrimary(first)
-            } else {
-                ProfileStore.primaryUserID = ""
-                legacyPrimaryUserID = nil
-            }
-        }
-
-        // Обновим сводку после удаления
-        refreshAllSummaries()
     }
 }
 
