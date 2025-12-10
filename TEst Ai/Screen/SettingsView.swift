@@ -39,18 +39,17 @@ struct SettingsView: View {
         return df
     }
 
-    
     var body: some View {
         Form {
             // Блок «Мой аккаунт»
             Section {
                 HStack(alignment: .center, spacing: 16) {
-                    // Аватарка (иконка по полу)
-                    Image(systemName: (primaryUser?.gender.symbolName) ?? "person.crop.circle.fill")
+                    // Аватарка (иконка по полу и возрасту)
+                    Image(systemName: (primaryUser?.symbolNameConsideringAge) ?? "person.crop.circle.fill")
                         .resizable()
                         .scaledToFit()
                         .frame(width: 56, height: 56)
-                        .foregroundStyle(colorForGender(primaryUser?.gender))
+                        .foregroundStyle(primaryUser?.colorConsideringAge ?? .gray)
                         .background(Color(.secondarySystemBackground))
                         .clipShape(Circle())
 
@@ -87,8 +86,21 @@ struct SettingsView: View {
                         showEditProfile = true
                     } label: {
                         Label("Редактировать", systemImage: "square.and.pencil")
+                            .labelStyle(.titleAndIcon)
+                            .font(.subheadline) // немного меньше шрифт
+                            .padding(.horizontal, 10)
+                            .padding(.vertical, 6) // компактнее по высоте
+                            .background(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(Color(.secondarySystemBackground))
+                            )
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .stroke(Color.gray.opacity(0.25), lineWidth: 1)
+                            )
                     }
-                    .buttonStyle(.bordered)
+                    .buttonStyle(.plain) // кастомный вид без системного отступа
+                    .contentShape(Rectangle())
                 }
                 .padding(.vertical, 6)
                 .contentShape(Rectangle())

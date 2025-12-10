@@ -61,8 +61,8 @@ struct NamesListView: View {
                                     .foregroundStyle(.yellow)
                             }
 
-                            Image(systemName: user.gender.symbolName)
-                                .foregroundStyle(user.gender == .female ? .pink : .blue)
+                            Image(systemName: user.symbolNameConsideringAge)
+                                .foregroundStyle(user.colorConsideringAge)
 
                             VStack(alignment: .leading, spacing: 2) {
                                 Text(user.name)

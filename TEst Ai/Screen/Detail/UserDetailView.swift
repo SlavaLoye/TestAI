@@ -12,11 +12,11 @@ struct UserDetailView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            Image(systemName: user.gender.symbolName)
+            Image(systemName: user.symbolNameConsideringAge)
                 .resizable()
                 .scaledToFit()
                 .frame(width: 120, height: 120)
-                .foregroundStyle(user.gender == .female ? .pink : .blue)
+                .foregroundStyle(user.colorConsideringAge)
 
             VStack(spacing: 8) {
                 Text(user.name)
