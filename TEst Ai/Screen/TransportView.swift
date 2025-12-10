@@ -95,6 +95,14 @@ struct TransportView: View {
                         }
                     }
                     .disabled(query.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isSearching)
+
+                    // Кнопка отмены поиска (сбрасывает результаты и очищает поле)
+                    if isSearching || !results.isEmpty || !query.isEmpty {
+                        Button("Отмена") {
+                            cancelSearch()
+                        }
+                        .buttonStyle(.bordered)
+                    }
                 }
                 .padding(.horizontal)
                 .padding(.top, 8)
@@ -209,6 +217,15 @@ struct TransportView: View {
             }
             results = response?.mapItems ?? []
         }
+    }
+
+    private func cancelSearch() {
+        activeSearch?.cancel()
+        activeSearch = nil
+        isSearching = false
+        results = []
+        query = ""
+        // destination НЕ трогаем по вашему запросу
     }
 
     // MARK: - Map controls
