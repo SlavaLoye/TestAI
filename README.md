@@ -86,15 +86,15 @@ MVVM
    
 • Models/
 
-   • User.swift􀰓
+   • User.swift
    
-   • Gender.swift􀰓
+   • Gender.swift
    
-   • UsersSeed.swift􀰓
+   • UsersSeed.swift
    
 • Storage/
 
-   • ProfileStore.swift􀰓
+   • ProfileStore.swift
    
 • Resources/
 
