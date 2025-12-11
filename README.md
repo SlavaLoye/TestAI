@@ -87,13 +87,13 @@ MVVM
 
 • App/
 
-   • TEst_AiApp.swift􀰓 — точка входа.
+   • TEst_AiApp.swift — точка входа.
    
    • AppRootView.swift — корневой контейнер навигации (ожидается в проекте).
    
 • Features/Profile/
 
-   • SettingsView.swift􀰓 — экран настроек/профиля.
+   • SettingsView.swift — экран настроек/профиля.
    
 • Models/
 
