@@ -64,18 +64,29 @@
 MVVM 
 
 • UI: SwiftUI
+
    • SettingsView — экран профиля/настроек с редактированием через sheet. Делегирует выход через onLogout.
 • Модели:
+
    • User — сущность пользователя (id, name, birthDate, gender).
+   
    • Gender — enum пола с локализуемыми title и символами SF Symbols.
+   
 • Данные:
+
    • UsersSeed — набор демонстрационных пользователей.
+   
    • ProfileStore — фасад над UserDefaults для полей профиля: primaryUserID, name, birthDate, gender, email и пр. Имеет ensureDefaultProfile() для bootstrap.
+   
 • Точка входа:
+
    • TEst_AiApp — @main, поднимает WindowGroup с AppRootView.
+   
 
 Структура проекта (предлагаемая логическая)
+
 • App/
+
    • TEst_AiApp.swift􀰓 — точка входа.
    
    • AppRootView.swift — корневой контейнер навигации (ожидается в проекте).
