@@ -13,12 +13,20 @@ struct User: Identifiable, Hashable {
     var name: String
     var birthDate: Date
     var gender: Gender
+    var avatarImageName: String? // Имя изображения из ассетов
 
-    init(id: UUID = UUID(), name: String, birthDate: Date, gender: Gender) {
+    init(
+        id: UUID = UUID(),
+        name: String,
+        birthDate: Date,
+        gender: Gender,
+        avatarImageName: String? = nil
+    ) {
         self.id = id
         self.name = name
         self.birthDate = birthDate
         self.gender = gender
+        self.avatarImageName = avatarImageName
     }
 }
 
@@ -60,3 +68,4 @@ extension User {
         }
     }
 }
+

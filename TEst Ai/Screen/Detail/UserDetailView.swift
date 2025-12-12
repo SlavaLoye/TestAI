@@ -12,11 +12,26 @@ struct UserDetailView: View {
 
     var body: some View {
         VStack(spacing: 24) {
-            Image(systemName: user.symbolNameConsideringAge)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 120, height: 120)
-                .foregroundStyle(user.colorConsideringAge)
+            // Фото из ассетов, если задано для этого пользователя
+            if let avatar = user.avatarImageName, !avatar.isEmpty {
+                Image(avatar)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 120, height: 120)
+                    .clipShape(Circle())
+                    .overlay(
+                        Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
+                    )
+                    .accessibilityLabel(Text("Аватар пользователя"))
+            } else {
+                // Фолбэк на системный символ, если фото не задано
+                Image(systemName: user.symbolNameConsideringAge)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 120, height: 120)
+                    .foregroundStyle(user.colorConsideringAge)
+                    .accessibilityLabel(Text("Иконка пользователя"))
+            }
 
             VStack(spacing: 8) {
                 Text(user.name)
@@ -72,8 +87,11 @@ struct UserDetailView: View {
 
 #Preview {
     NavigationStack {
-        UserDetailView(user: User(name: "Мария",
-                                  birthDate: Date(timeIntervalSince1970: 567993600),
-                                  gender: .female))
+        UserDetailView(user: User(
+            name: "Мария",
+            birthDate: Date(timeIntervalSince1970: 915148800),
+            gender: .female,
+            avatarImageName: "miss" // имя ассета из вашего каталога
+        ))
     }
 }

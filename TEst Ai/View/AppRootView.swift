@@ -29,7 +29,7 @@ struct AppRootView: View {
             if !isLoggedIn {
                 NavigationStack {
                     LoginView(onLogin: { isLoggedIn = true })
-                        .navigationTitle(NSLocalizedString("login.title", comment: "Sign in with Email"))
+                        .navigationTitle(NSLocalizedString("", comment: ""))
                 }
             } else if !didFinishOnboarding {
                 OnboardingFlow(onFinish: { didFinishOnboarding = true })

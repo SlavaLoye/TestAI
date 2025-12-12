@@ -37,51 +37,35 @@ struct NamesListView: View {
             .padding(.horizontal)
 
             List {
-                ForEach(vm.filteredUsers) { user in
-                    NavigationLink {
-                        UserDetailView(user: user)
-                    } label: {
-                        HStack(spacing: 8) {
-                            // Метка главного пользователя
+                Section {
+                    ForEach(vm.filteredUsers) { user in
+                        NavigationLink {
+                            UserDetailView(user: user)
+                        } label: {
+                            UserCardRow(
+                                user: user,
+                                isPrimary: vm.isPrimary(user),
+                                summary: vm.ticketSummary[user.id]
+                            )
+                        }
+                        .listRowInsets(EdgeInsets(top: 8, leading: 16, bottom: 8, trailing: 16))
+                        .listRowBackground(Color.clear)
+                        .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                             if vm.isPrimary(user) {
-                                Image(systemName: "star.fill")
-                                    .foregroundStyle(.yellow)
-                            }
-
-                            Image(systemName: user.symbolNameConsideringAge)
-                                .foregroundStyle(user.colorConsideringAge)
-
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text(user.name)
-                                    .font(vm.isPrimary(user) ? .headline : .body)
-
-                                // Подзаголовок с билетами: "<Title> — <count>, <Title> — <count>"
-                                if let summary = vm.ticketSummary[user.id] {
-                                    let parts = [
-                                        summary.bus > 0 ? "bus - \(summary.bus)" : nil,
-                                        summary.metro > 0 ? "metro - \(summary.metro)" : nil
-                                    ].compactMap { $0 }
-
-                                    if !parts.isEmpty {
-                                        Text(parts.joined(separator: ", "))
-                                            .font(.caption)
-                                            .foregroundStyle(.secondary)
-                                    } else {
-                                        Text(NSLocalizedString("tickets.none", comment: "No tickets"))
-                                            .font(.caption)
-                                            .foregroundStyle(.tertiary)
-                                    }
-                                } else {
-                                    // Пока не загружено — можно показать плейсхолдер
-                                    Text("—")
-                                        .font(.caption)
-                                        .foregroundStyle(.tertiary)
+                                Button {
+                                    // Ничего: подсветка, что это главный
+                                } label: {
+                                    Label("Главный", systemImage: "star.fill")
+                                }
+                                .tint(.gray)
+                            } else {
+                                Button(role: .destructive) {
+                                    vm.deleteUser(user)
+                                } label: {
+                                    Label("Удалить", systemImage: "trash.fill")
                                 }
                             }
-
-                            Spacer()
                         }
-                        .contentShape(Rectangle())
                         .contextMenu {
                             if vm.isPrimary(user) {
                                 Button {
@@ -97,31 +81,14 @@ struct NamesListView: View {
                                 }
                             }
                         }
-                    }
-                    .swipeActions(edge: .trailing, allowsFullSwipe: true) {
-                        if vm.isPrimary(user) {
-                            // Запрещаем удаление главного — не показываем destructive кнопку
-                            Button {
-                                // Ничего: можно подсветить, что это главный
-                            } label: {
-                                Label("Главный", systemImage: "star.fill")
-                            }
-                            .tint(.gray)
-                        } else {
-                            Button(role: .destructive) {
-                                vm.deleteUser(user)
-                            } label: {
-                                Label("Удалить", systemImage: "trash.fill")
-                            }
+                        .onAppear {
+                            vm.refreshSummary(for: user)
                         }
                     }
-                    .onAppear {
-                        // Обновим сводку для пользователя при появлении строки
-                        vm.refreshSummary(for: user)
-                    }
+                    .onDelete(perform: vm.delete)
                 }
-                .onDelete(perform: vm.delete)
             }
+            .listStyle(.insetGrouped)
         }
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
@@ -152,6 +119,113 @@ struct NamesListView: View {
         .onAppear {
             vm.onAppear()
         }
+    }
+}
+
+private struct UserCardRow: View {
+    let user: User
+    let isPrimary: Bool
+    let summary: (bus: Int, metro: Int)?
+
+    // Фирменные цвета
+    private let brandBlue1 = Color(red: 0.30, green: 0.64, blue: 0.96)
+    private let brandBlue2 = Color(red: 0.18, green: 0.49, blue: 0.88)
+    private let brandRed1 = Color(red: 1.00, green: 0.27, blue: 0.27)
+    private let brandRed2 = Color(red: 0.90, green: 0.10, blue: 0.10)
+
+    var body: some View {
+        ZStack {
+            // Карточка
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(Color(.secondarySystemBackground))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(Color.black.opacity(0.05), lineWidth: 0.5)
+                )
+                .shadow(color: .black.opacity(0.06), radius: 8, x: 0, y: 4)
+
+            HStack(spacing: 12) {
+                // Аватар: если есть фото — показываем его, иначе SF Symbol
+                if let avatar = user.avatarImageName, !avatar.isEmpty {
+                    Image(avatar)
+                        .resizable()
+                        .scaledToFill()
+                        .frame(width: 44, height: 44)
+                        .clipShape(Circle())
+                        .overlay(
+                            Circle().stroke(Color.black.opacity(0.08), lineWidth: 0.5)
+                        )
+                } else {
+                    ZStack {
+                        Circle()
+                            .fill(
+                                LinearGradient(colors: [brandBlue1.opacity(0.18), brandBlue2.opacity(0.10)],
+                                               startPoint: .topLeading, endPoint: .bottomTrailing)
+                            )
+                            .frame(width: 44, height: 44)
+                        Image(systemName: user.symbolNameConsideringAge)
+                            .foregroundStyle(user.colorConsideringAge)
+                            .font(.system(size: 20, weight: .semibold))
+                    }
+                }
+
+                VStack(alignment: .leading, spacing: 4) {
+                    HStack(spacing: 6) {
+                        Text(user.name)
+                            .font(.headline)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+
+                        if isPrimary {
+                            Label("Главный", systemImage: "star.fill")
+                                .labelStyle(.iconOnly)
+                                .font(.system(size: 12, weight: .semibold))
+                                .foregroundStyle(LinearGradient(colors: [brandRed1, brandRed2], startPoint: .top, endPoint: .bottom))
+                                .padding(.horizontal, 6)
+                                .padding(.vertical, 2)
+                                .background(
+                                    Capsule().fill(Color(.systemBackground))
+                                )
+                                .overlay(
+                                    Capsule().stroke(Color.black.opacity(0.08), lineWidth: 0.5)
+                                )
+                        }
+                    }
+
+                    // Подзаголовок с билетами
+                    Group {
+                        if let summary {
+                            let parts = [
+                                summary.bus > 0 ? "bus - \(summary.bus)" : nil,
+                                summary.metro > 0 ? "metro - \(summary.metro)" : nil
+                            ].compactMap { $0 }
+
+                            if !parts.isEmpty {
+                                Text(parts.joined(separator: ", "))
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            } else {
+                                Text(NSLocalizedString("tickets.none", comment: "No tickets"))
+                                    .font(.caption)
+                                    .foregroundStyle(.tertiary)
+                            }
+                        } else {
+                            Text("—")
+                                .font(.caption)
+                                .foregroundStyle(.tertiary)
+                        }
+                    }
+                }
+
+                Spacer()
+                // ВАЖНО: не рисуем свою стрелку — её добавляет NavigationLink.
+            }
+            .padding(.horizontal, 12)
+            .padding(.vertical, 10)
+        }
+        .contentShape(Rectangle())
+        .animation(.default, value: summary?.bus ?? -1)
+        .animation(.default, value: summary?.metro ?? -1)
     }
 }
 

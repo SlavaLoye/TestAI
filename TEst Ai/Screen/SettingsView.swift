@@ -51,14 +51,25 @@ struct SettingsView: View {
             // Блок «Мой аккаунт»
             Section {
                 HStack(alignment: .center, spacing: 16) {
-                    // Аватарка (иконка по полу и возрасту)
-                    Image(systemName: (primaryUserFromSeed?.symbolNameConsideringAge) ?? "person.crop.circle.fill")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 56, height: 56)
-                        .foregroundStyle(primaryUserFromSeed?.colorConsideringAge ?? .gray)
-                        .background(Color(.secondarySystemBackground))
-                        .clipShape(Circle())
+                    // Аватарка: если есть фото — показываем, иначе SF Symbol
+                    if let avatar = primaryUserFromSeed?.avatarImageName, !avatar.isEmpty {
+                        Image(avatar)
+                            .resizable()
+                            .scaledToFill()
+                            .frame(width: 56, height: 56)
+                            .clipShape(Circle())
+                            .overlay(
+                                Circle().stroke(Color.black.opacity(0.1), lineWidth: 1)
+                            )
+                    } else {
+                        Image(systemName: (primaryUserFromSeed?.symbolNameConsideringAge) ?? "person.crop.circle.fill")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 56, height: 56)
+                            .foregroundStyle(primaryUserFromSeed?.colorConsideringAge ?? .gray)
+                            .background(Color(.secondarySystemBackground))
+                            .clipShape(Circle())
+                    }
 
                     VStack(alignment: .leading, spacing: 6) {
                         // Имя берем из профиля (источник правды), если не пустое, иначе fallback к сид-пользователю
