@@ -92,4 +92,15 @@
 "addticket.quantity.picker" = "Fahrten";
 "addticket.buy" = "Kaufen";
 
+/* Tickets Zusammenfassung */
+"tickets.summary.bus" = "Bus — %d";
+"tickets.summary.metro" = "U-Bahn — %d";
 
+/* Profil-Tab */
+"tab.profile" = "Mein Profil";
+
+/* Abmeldebestätigung */
+"logout.confirm.title" = "Abmelden";
+"logout.confirm.cancel" = "Abbrechen";
+"logout.confirm.ok" = "Abmelden";
+"logout.confirm.message" = "Möchten Sie sich wirklich abmelden?";

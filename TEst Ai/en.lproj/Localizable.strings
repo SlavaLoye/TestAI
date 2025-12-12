@@ -36,6 +36,7 @@
 "tab.transport" = "Subscriptions";
 "tab.home" = "Home";
 "tab.settings" = "Settings";
+
 /* New tabs */
 "tab.tickets" = "Tickets";
 "tab.map" = "Map";
@@ -94,10 +95,14 @@
 "addticket.quantity.picker" = "Rides";
 "addticket.buy" = "Buy";
 
+/* Tickets summary */
 "tickets.summary.bus" = "bus — %d";
 "tickets.summary.metro" = "metro — %d";
+
+/* Profile tab */
 "tab.profile" = "My Profile";
 
+/* Logout confirmation */
 "logout.confirm.title" = "Logout";
 "logout.confirm.cancel" = "Cancel";
 "logout.confirm.ok" = "Logout";
