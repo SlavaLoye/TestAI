@@ -100,3 +100,5 @@
 "logout.confirm.cancel"= "Отмена";
 "logout.confirm.ok" = "Выйти";
 "logout.confirm.message" = "Вы действительно хотите выйти?";
+"onboarding.page3.title" = "Карта и геолокация";
+"onboarding.page3.subtitle" = "Смотрите трафик, своё местоположение и добирайтесь быстрее.";

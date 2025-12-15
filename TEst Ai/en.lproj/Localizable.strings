@@ -76,6 +76,9 @@
 "onboarding.page1.subtitle" = "Manage people, transport and home in one place.";
 "onboarding.page2.title" = "Map & Location";
 "onboarding.page2.subtitle" = "See traffic, your location and navigate faster.";
+"onboarding.page3.title" = "Map and Geolocation";
+"onboarding.page3.subtitle" = "See traffic, your location, and get there faster.";
+
 "onboarding.next" = "Next";
 "onboarding.finish" = "Continue";
 
@@ -107,3 +110,4 @@
 "logout.confirm.cancel" = "Cancel";
 "logout.confirm.ok" = "Logout";
 "logout.confirm.message" = "Are you sure you want to log out?";
+
