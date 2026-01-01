@@ -62,8 +62,15 @@ struct MainTabView: View {
 
             // Профиль
             NavigationStack {
-                SettingsView(onLogout: onLogout)
+                ProfileView()
                     .navigationTitle(NSLocalizedString("tab.profile", comment: "My Profile"))
+                    .toolbar {
+                        ToolbarItem(placement: .topBarLeading) {
+                            Button(NSLocalizedString("logout.button.title", comment: "Выйти")) {
+                                onLogout()
+                            }
+                        }
+                    }
             }
             .tabItem {
                 Image(systemName: "person.crop.circle.fill")
@@ -85,3 +92,4 @@ struct MainTabView: View {
 #Preview {
     MainTabView(vyacheslavID: "11111111-1111-1111-1111-111111111111", onLogout: {})
 }
+

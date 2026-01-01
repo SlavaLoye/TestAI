@@ -8,6 +8,7 @@
 import SwiftUI
 import MapKit
 import CoreLocation
+import UIKit
 
 struct TrafficMapView: UIViewRepresentable {
     @Binding var region: MKCoordinateRegion
@@ -17,6 +18,9 @@ struct TrafficMapView: UIViewRepresentable {
     var startCoordinate: CLLocationCoordinate2D?
     var endCoordinate: CLLocationCoordinate2D?
     var transportType: MKDirectionsTransportType = .transit // .automobile, .walking, .transit
+
+    // Управление подсказками и клавиатурой
+    @Binding var isShowingSuggestions: Bool
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
@@ -45,6 +49,11 @@ struct TrafficMapView: UIViewRepresentable {
         mapView.userTrackingMode = showsUserLocation ? .follow : .none
 
         mapView.delegate = context.coordinator
+
+        // Тап по пустой области карты — скрыть клавиатуру и подсказки
+        let tap = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleMapTap))
+        tap.cancelsTouchesInView = false
+        mapView.addGestureRecognizer(tap)
 
         // Запросить авторизацию геолокации
         context.coordinator.requestLocationAuthorization()
@@ -78,29 +87,31 @@ struct TrafficMapView: UIViewRepresentable {
     }
 
     func makeCoordinator() -> Coordinator {
-        Coordinator(parent: self)
+        Coordinator(parent: self, isShowingSuggestions: $isShowingSuggestions)
     }
 
     final class Coordinator: NSObject, MKMapViewDelegate, CLLocationManagerDelegate {
         private let parent: TrafficMapView
         private let locationManager = CLLocationManager()
+        private var isShowingSuggestions: Binding<Bool>
 
-        // Кэш последних параметров, чтобы не перестраивать маршрут лишний раз
-        private var lastStart: CLLocationCoordinate2D?
-        private var lastEnd: CLLocationCoordinate2D?
-        private var lastType: MKDirectionsTransportType = []
-
-        // Храним активный MKDirections, чтобы отменять при повторных вызовах
-        private var activeDirections: MKDirections?
-
-        init(parent: TrafficMapView) {
+        init(parent: TrafficMapView, isShowingSuggestions: Binding<Bool>) {
             self.parent = parent
+            self.isShowingSuggestions = isShowingSuggestions
             super.init()
             locationManager.delegate = self
         }
 
         func requestLocationAuthorization() {
             locationManager.requestWhenInUseAuthorization()
+        }
+
+        // MARK: - UI helpers
+        @objc func handleMapTap() {
+            // Скрыть клавиатуру
+            UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
+            // Скрыть подсказки
+            isShowingSuggestions.wrappedValue = false
         }
 
         // MARK: - Routing
@@ -249,5 +260,13 @@ struct TrafficMapView: UIViewRepresentable {
             }
             return MKOverlayRenderer(overlay: overlay)
         }
+
+        // Кэш последних параметров, чтобы не перестраивать маршрут лишний раз
+        private var lastStart: CLLocationCoordinate2D?
+        private var lastEnd: CLLocationCoordinate2D?
+        private var lastType: MKDirectionsTransportType = []
+
+        // Храним активный MKDirections, чтобы отменять при повторных вызовах
+        private var activeDirections: MKDirections?
     }
 }
